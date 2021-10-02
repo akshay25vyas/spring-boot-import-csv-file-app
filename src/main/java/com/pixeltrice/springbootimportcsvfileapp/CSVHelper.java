@@ -44,7 +44,7 @@ public class CSVHelper {
 
             for (CSVRecord csvRecord : csvRecords) {
                 DeveloperTutorial developerTutorial = new DeveloperTutorial(
-                        Long.parseLong(csvRecord.get("userid")),
+                        Integer.parseInt(csvRecord.get("userid")),
                         csvRecord.get("name"),
                         csvRecord.get("email"),
                         Integer.parseInt(csvRecord.get("incentive"))

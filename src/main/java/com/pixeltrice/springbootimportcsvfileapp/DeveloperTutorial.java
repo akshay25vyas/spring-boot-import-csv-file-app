@@ -12,7 +12,7 @@ public class DeveloperTutorial {
 
     @Id
     @Column(name = "userid")
-    private long userid;
+    private int userid;
 
     @Column(name = "name")
     private String name;
@@ -23,11 +23,21 @@ public class DeveloperTutorial {
     @Column(name = "incentive")
     private int incentive;
 
-    public long getUserid() {
+    public int getUserid() {
         return userid;
     }
 
-    public void setUserid(long userid) {
+    public DeveloperTutorial() {
+    }
+
+    public DeveloperTutorial(int userid, String name, String email, int incentive) {
+        this.userid = userid;
+        this.name = name;
+        this.email = email;
+        this.incentive = incentive;
+    }
+
+    public void setUserid(int userid) {
         this.userid = userid;
     }
 
@@ -52,16 +62,6 @@ public class DeveloperTutorial {
     }
 
     public void setIncentive(int incentive) {
-        this.incentive = incentive;
-    }
-
-    public DeveloperTutorial() {
-    }
-
-    public DeveloperTutorial(long userid, String name, String email, int incentive) {
-        this.userid = userid;
-        this.name = name;
-        this.email = email;
         this.incentive = incentive;
     }
 }
