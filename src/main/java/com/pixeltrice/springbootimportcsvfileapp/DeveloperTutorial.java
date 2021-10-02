@@ -10,64 +10,69 @@ import javax.persistence.Table;
 @Table(name = "developer_tutorial")
 public class DeveloperTutorial {
 
-	  @Id
-	  @Column(name = "id")
-	  private long id;
+//	  @Id
+//	  @Column(name = "id")
+//	  private long id;
+//
+//	  @Column(name = "title")
+//	  private String title;
+//
+//	  @Column(name = "description")
+//	  private String description;
+//
+//	  @Column(name = "published")
+//	  private boolean published;
 
-	  @Column(name = "title")
-	  private String title;
+	@Id
+	@Column(name = "userid")
+	private long userid;
 
-	  @Column(name = "description")
-	  private String description;
+	@Column(name = "name")
+	private String name;
 
-	  @Column(name = "published")
-	  private boolean published;
+	@Column(name = "email")
+	private String email;
+
+	@Column(name = "incentive")
+	private int incentive;
 
 	  public DeveloperTutorial() {
 
 	  }
 
-	  public DeveloperTutorial(long id, String title, String description, boolean published) {
-	    this.id = id;
-	    this.title = title;
-	    this.description = description;
-	    this.published = published;
-	  }
+	public DeveloperTutorial(long userid, String name, String email, int incentive) {
+		this.userid = userid;
+		this.name = name;
+		this.email = email;
+		this.incentive = incentive;
+	}
 
-	  public long getId() {
-	    return id;
-	  }
+	public String getName() {
+		return name;
+	}
 
-	  public void setId(long id) {
-	    this.id = id;
-	  }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-	  public String getTitle() {
-	    return title;
-	  }
+	public String getEmail() {
+		return email;
+	}
 
-	  public void setTitle(String title) {
-	    this.title = title;
-	  }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-	  public String getDescription() {
-	    return description;
-	  }
+	public int getIncentive() {
+		return incentive;
+	}
 
-	  public void setDescription(String description) {
-	    this.description = description;
-	  }
+	public void setIncentive(int incentive) {
+		this.incentive = incentive;
+	}
 
-	  public boolean isPublished() {
-	    return published;
-	  }
-
-	  public void setPublished(boolean isPublished) {
-	    this.published = isPublished;
-	  }
-
-	  @Override
-	  public String toString() {
-	    return "Tutorial [id=" + id + ", title=" + title + ", desc=" + description + ", published=" + published + "]";
-	  }
+//	@Override
+//	  public String toString() {
+//	    return "Tutorial [id=" + id + ", title=" + title + ", desc=" + description + ", published=" + published + "]";
+//	  }
 	}
