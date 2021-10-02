@@ -25,7 +25,7 @@ public class DeveloperTutorial {
 
 	@Id
 	@Column(name = "userid")
-	private long userid;
+	private int userid;
 
 	@Column(name = "name")
 	private String name;
@@ -40,11 +40,15 @@ public class DeveloperTutorial {
 
 	  }
 
-	public DeveloperTutorial(long userid, String name, String email, int incentive) {
+	public DeveloperTutorial(int userid, String name, String email, int incentive) {
 		this.userid = userid;
 		this.name = name;
 		this.email = email;
 		this.incentive = incentive;
+	}
+
+	public int getUserid() {
+		return userid;
 	}
 
 	public String getName() {

@@ -1,17 +1,17 @@
 package com.pixeltrice.springbootimportcsvfileapp;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class CSVService {
-  @Autowired
-  DeveloperTutorialRepository repository;
+    @Autowired
+    DeveloperTutorialRepository repository;
+
+    @Autowired
+    UserStocksRepository stocksRepository;
 
 //  public void save(MultipartFile file) {
 //    try {
@@ -29,54 +29,57 @@ public class CSVService {
 //    return in;
 //  }
 
-  public List<DeveloperTutorial> getAllTutorials() {
-    return repository.findAll();
-  }
+    public List<DeveloperTutorial> getAllTutorials() {
+        return repository.findAll();
+    }
 
-  public UserProfileResponse getUserProfileFromId(String email) {
-    UserProfileResponse response = new UserProfileResponse(email);
+    public UserProfileResponse getUserProfileFromId(String email) {
+        UserProfileResponse response = new UserProfileResponse(email);
 
-    DeveloperTutorial user = repository.findUserByEmail(email);
-    response.setUserName(user.getName());
+        DeveloperTutorial user = repository.findUserByEmail(email);
+        response.setUserName(user.getName());
 
 //    List<UserStocks> userStocks = stockRepository.findAllStocksByUserId(user.getUserId());
 //    response.setStocks(userStocks);
 
-    return response;
-  }
+        return response;
+    }
 
-  public boolean addUserInvestment(String email, List<StockInvestmentRequest> stocks) {
+    public boolean addUserInvestment(String email, List<StockInvestmentRequest> stocks) {
 
-//        User user = getUserFromEmail(email);
-    User user = new User();
+        DeveloperTutorial user = repository.findUserByEmail(email);
+//        User user = new User();
 
-    user.setEmail(email);
+        user.setEmail(email);
 
 //        int incentive = user.getIncentive();
-    int incentive = 0;
+        int incentive = 0;
 
-    for (StockInvestmentRequest stock : stocks) {
-      incentive += stock.getIncentive();
-    }
-    user.setIncentive(incentive);
+        for (StockInvestmentRequest stock : stocks) {
+            incentive += stock.getIncentive();
+        }
+        user.setIncentive(incentive);
 
-    addUserStocksInInvestment(user.getUserId(), stocks);
+        addUserStocksInInvestment(user.getUserid(), stocks);
 
 //    log.info("Incentive: " + incentive);
 
-    return true;
-  }
-
-  private void addUserStocksInInvestment(int userId, List<StockInvestmentRequest> stocks) {
-    for (StockInvestmentRequest stock : stocks) {
-//            UserStocks userStocks = getUserStocksFromUserIdAndStockId(userId, stock.getId());
-      UserStocks userStocks = new UserStocks();
-      userStocks.setUserId(userId);
-      userStocks.setQuantity(userStocks.getQuantity() + stock.getQuantity());
-      userStocks.setTotalPurchasePrice(userStocks.getTotalPurchasePrice() + stock.getPrice()*stock.getQuantity());
-      // Save userStocks record
-//      log.info(userStocks.toString());
+        return true;
     }
-  }
+
+    private void addUserStocksInInvestment(int userId, List<StockInvestmentRequest> stocks) {
+        for (StockInvestmentRequest stock : stocks) {
+            UserStocks userStocks = stocksRepository.findUserStocksFromUserIdAndStockId(userId, stock.getStockId());
+            if (userStocks == null) {
+                userStocks = new UserStocks();
+            }
+//      UserStocks userStocks = new UserStocks();
+            userStocks.setUserid(userId);
+            userStocks.setQuantity(userStocks.getQuantity() + stock.getQuantity());
+            userStocks.setTotalPurchasePrice(userStocks.getTotalPurchasePrice() + stock.getPrice()*stock.getQuantity());
+            // Save userStocks record
+//      log.info(userStocks.toString());
+        }
+    }
 }
 
