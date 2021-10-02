@@ -1,0 +1,32 @@
+{
+    "GENERIC_ERROR": {
+        "status": "Unknown error",
+        "code": "500",
+        "errorCode": "5001",
+        "message": ""
+    },
+    "BAD_REQUEST": {
+        "status": "Invalid Request",
+        "code": "400",
+        "errorCode": "4001",
+        "message": "One or more Request Param is Invalid or Empty"
+    },
+    "POLYLINE_DECODING_ERROR": {
+        "status": "Polyline decoding failed",
+        "code": "500",
+        "errorCode": "5002",
+        "message": "Some error occurred while decoding polylines. Please try again."
+    },
+    "GOOGLE_CLIENT_ERROR": {
+        "status": "Google client call failed",
+        "code": "404",
+        "errorCode": "4002",
+        "message": "Call to google's API failed."
+    },
+    "INVALID_TRAVEL_MODE": {
+        "status": "Invalid travel mode",
+        "code": "400",
+        "errorCode": "4003",
+        "message": "Invalid travel mode in the request. Please check again"
+    }
+}
