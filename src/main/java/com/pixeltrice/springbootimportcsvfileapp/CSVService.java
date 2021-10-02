@@ -3,6 +3,7 @@ package com.pixeltrice.springbootimportcsvfileapp;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,27 @@ public class CSVService {
     @Autowired
     UserStocksRepository stocksRepository;
 
+    @Autowired
+    StockEsgRepository stockEsgRepository;
+
     public void save(MultipartFile file) {
-        try {
-            List<DeveloperTutorial> tutorials = CSVHelper.csvToTutorials(file.getInputStream());
-            repository.saveAll(tutorials);
-        } catch (IOException e) {
-            throw new RuntimeException("fail to store csv data: " + e.getMessage());
+        if (Objects.equals(file.getOriginalFilename(), "data.csv")) {
+
+            try {
+                List<DeveloperTutorial> tutorials = CSVHelper.csvToTutorials(file.getInputStream());
+                repository.saveAll(tutorials);
+            } catch (IOException e) {
+                throw new RuntimeException("fail to store csv data: " + e.getMessage());
+            }
+        }
+
+        if (Objects.equals(file.getOriginalFilename(), "stock_esg_data.csv")) {
+            try {
+                List<StockEsg> stockEsgs = CSVHelper.csvToStockEsgs(file.getInputStream());
+                stockEsgRepository.saveAll(stockEsgs);
+            } catch (IOException e) {
+                throw new RuntimeException("fail to store csv data: " + e.getMessage());
+            }
         }
     }
 
@@ -85,5 +101,11 @@ public class CSVService {
         }
     }
 
+
+    private void getEsgValueByStockName(String stockName) {
+        StockEsg stockEsg = stockEsgRepository.findById(stockName).get();
+
+    }
 }
+
 

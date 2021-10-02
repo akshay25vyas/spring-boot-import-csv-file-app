@@ -59,6 +59,31 @@ public class CSVHelper {
         }
     }
 
+
+    public static List<StockEsg> csvToStockEsgs(InputStream is) {
+        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+             CSVParser csvParser = new CSVParser(fileReader,
+                     CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());) {
+
+            List<StockEsg> stockEsgList = new ArrayList<>();
+
+            Iterable<CSVRecord> csvRecords = csvParser.getRecords();
+
+
+            for (CSVRecord csvRecord : csvRecords) {
+                StockEsg stockEsg = new StockEsg(
+                        csvRecord.get(0),
+                        Double.parseDouble(csvRecord.get(1))
+                );
+                stockEsgList.add(stockEsg);
+            }
+
+            return stockEsgList;
+        } catch (IOException e) {
+            throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
+        }
+    }
+
     public static ByteArrayInputStream tutorialsToCSV(List<DeveloperTutorial> developerTutorialList) {
         final CSVFormat format = CSVFormat.DEFAULT.withQuoteMode(QuoteMode.MINIMAL);
 
