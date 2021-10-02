@@ -20,6 +20,10 @@ public class CSVService {
     @Autowired
     StockEsgRepository stockEsgRepository;
 
+    @Autowired
+    StockPriceRepository stockPriceRepository;
+
+
     public void save(MultipartFile file) {
         if (Objects.equals(file.getOriginalFilename(), "data.csv")) {
 
@@ -35,6 +39,15 @@ public class CSVService {
             try {
                 List<StockEsg> stockEsgs = CSVHelper.csvToStockEsgs(file.getInputStream());
                 stockEsgRepository.saveAll(stockEsgs);
+            } catch (IOException e) {
+                throw new RuntimeException("fail to store csv data: " + e.getMessage());
+            }
+        }
+
+        if (Objects.equals(file.getOriginalFilename(), "stock_price_data.csv")) {
+            try {
+                List<StockPrice> stockPrice = CSVHelper.csvToStockPrice(file.getInputStream());
+                stockPriceRepository.saveAll(stockPrice);
             } catch (IOException e) {
                 throw new RuntimeException("fail to store csv data: " + e.getMessage());
             }
