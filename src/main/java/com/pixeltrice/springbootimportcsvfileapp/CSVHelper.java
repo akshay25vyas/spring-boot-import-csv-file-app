@@ -73,7 +73,7 @@ public class CSVHelper {
             for (CSVRecord csvRecord : csvRecords) {
                 StockEsg stockEsg = new StockEsg(
                         csvRecord.get(0),
-                        Double.parseDouble(csvRecord.get(1))
+                        Math.round(Double.parseDouble(csvRecord.get(1)) * 100.0)
                 );
                 stockEsgList.add(stockEsg);
             }
@@ -96,7 +96,7 @@ public class CSVHelper {
             for (CSVRecord csvRecord : csvRecords) {
                 StockPrice stockPrice = new StockPrice(
                         csvRecord.get(0),
-                        Double.parseDouble(csvRecord.get(1))
+                        Math.ceil(Double.parseDouble(csvRecord.get(1)))
                 );
                 stockPriceList.add(stockPrice);
             }

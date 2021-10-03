@@ -1,7 +1,16 @@
 package com.pixeltrice.springbootimportcsvfileapp;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -12,7 +21,8 @@ import java.util.*;
 public class CSVService {
     public static final Double ALPHA = 0.5;
     public static final Double Beta = 0.5;
-    public static final Integer k = 5;
+    public static final Integer k = 10;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     DeveloperTutorialRepository repository;
@@ -139,7 +149,7 @@ public class CSVService {
             companyList.add(new Company(pq.peek().name, pq.peek().esgScore, pq.peek().stockPredictedPrice));
             pq.remove();
 
-            if (companyList.size() == 5) break;
+            if (companyList.size() == k) break;
         }
         pq.clear();
         return companyList;
@@ -158,6 +168,63 @@ public class CSVService {
             return 0;
         }
     }
+
+
+    public List<Company> getTopCompaniesToInvestWithLP() throws Exception {
+        return callFlaskApiWithParam();
+    }
+
+
+    private List<Company> callFlaskApiWithParam() throws JsonProcessingException, JSONException {
+        RestTemplate restTemplate = new RestTemplate();
+        String flaskResourceUrl
+                = "http://localhost:5000/evaluate";
+
+
+        PriorityQueue<PairClass> pq = new PriorityQueue<>(100, new PairClassComparator());
+
+        List<StockEsg> stockEsgList = stockEsgRepository.findAll();
+
+        for (StockEsg stockEsg : stockEsgList) {
+            String name = stockEsg.getStockname();
+            Double esgValue = stockEsg.getEsgvalue();
+
+            Optional<StockPrice> stockPrice = stockPriceRepository.findById(name);
+            Double predictionPrice = stockPrice.get().getStockPricePredicted();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            JSONObject personJsonObject = new JSONObject();
+            personJsonObject.put("esgvalue", esgValue);
+            personJsonObject.put("stockpricepredicted", predictionPrice);
+
+            HttpEntity<String> request =
+                    new HttpEntity<>(personJsonObject.toString(), headers);
+
+            String personResultAsJsonStr =
+                    restTemplate.postForObject(flaskResourceUrl, request, String.class);
+            JsonNode root = objectMapper.readTree(personResultAsJsonStr);
+            JsonNode alphaReturned = root.path("alpha");
+            JsonNode betaReturned = root.path("beta");
+
+            pq.add(new PairClass(name, alphaReturned.asDouble() * esgValue + betaReturned.asDouble() * predictionPrice, esgValue, predictionPrice));
+
+        }
+
+        List<Company> companyList = new ArrayList<>();
+
+        while (!pq.isEmpty()) {
+
+            companyList.add(new Company(pq.peek().name, pq.peek().esgScore, pq.peek().stockPredictedPrice));
+            pq.remove();
+
+            if (companyList.size() == k) break;
+        }
+        pq.clear();
+        return companyList;
+
+    }
+
 
 }
 

@@ -101,10 +101,11 @@ public class CSVController {
 
 
     @GetMapping("/investmore")
-    public ResponseEntity<List<Company>> getTopCompaniesToInvest() {
+    public ResponseEntity<List<Company>> getTopCompaniesToInvest() throws Exception {
 
         try {
             List<Company> companyList = fileService.getTopCompaniesToInvest();
+//            List<Company> companyList = fileService.getTopCompaniesToInvestWithLP();
             if (companyList.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
