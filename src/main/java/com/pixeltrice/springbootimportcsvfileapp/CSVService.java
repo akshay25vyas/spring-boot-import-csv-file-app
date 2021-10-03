@@ -1,16 +1,19 @@
 package com.pixeltrice.springbootimportcsvfileapp;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.*;
+
 @Service
 public class CSVService {
+    public static final Double ALPHA = 0.5;
+    public static final Double Beta = 0.5;
+    public static final Integer k = 5;
+
     @Autowired
     DeveloperTutorialRepository repository;
 
@@ -71,20 +74,15 @@ public class CSVService {
         DeveloperTutorial user = repository.findUserByEmail(email);
         response.setUserName(user.getName());
 
-//    List<UserStocks> userStocks = stockRepository.findAllStocksByUserId(user.getUserId());
-//    response.setStocks(userStocks);
-
         return response;
     }
 
     public boolean addUserInvestment(String email, List<StockInvestmentRequest> stocks) {
 
         DeveloperTutorial user = repository.findUserByEmail(email);
-//        User user = new User();
 
         user.setEmail(email);
 
-//        int incentive = user.getIncentive();
         int incentive = 0;
 
         for (StockInvestmentRequest stock : stocks) {
@@ -94,7 +92,6 @@ public class CSVService {
 
         addUserStocksInInvestment(user.getUserid(), stocks);
 
-//    log.info("Incentive: " + incentive);
 
         return true;
     }
@@ -105,20 +102,63 @@ public class CSVService {
             if (userStocks == null) {
                 userStocks = new UserStocks();
             }
-//      UserStocks userStocks = new UserStocks();
+
             userStocks.setUserid(userId);
             userStocks.setQuantity(userStocks.getQuantity() + stock.getQuantity());
             userStocks.setTotalPurchasePrice(userStocks.getTotalPurchasePrice() + stock.getPrice() * stock.getQuantity());
-            // Save userStocks record
-//      log.info(userStocks.toString());
+
         }
     }
 
-
     private void getEsgValueByStockName(String stockName) {
         StockEsg stockEsg = stockEsgRepository.findById(stockName).get();
-
     }
+
+    public List<Company> getTopCompaniesToInvest() {
+
+        PriorityQueue<PairClass> pq = new PriorityQueue<>(100, new PairClassComparator());
+
+
+        List<StockEsg> stockEsgList = stockEsgRepository.findAll();
+
+        for (StockEsg stockEsg : stockEsgList) {
+            String name = stockEsg.getStockname();
+            Double esgValue = stockEsg.getEsgvalue();
+
+            Optional<StockPrice> stockPrice = stockPriceRepository.findById(name);
+            Double predictionPrice = stockPrice.get().getStockPricePredicted();
+
+            pq.add(new PairClass(name, ALPHA * esgValue + Beta * predictionPrice, esgValue, predictionPrice));
+
+        }
+
+        List<Company> companyList = new ArrayList<>();
+
+        while (!pq.isEmpty()) {
+
+            companyList.add(new Company(pq.peek().name, pq.peek().esgScore, pq.peek().stockPredictedPrice));
+            pq.remove();
+
+            if (companyList.size() == 5) break;
+        }
+        pq.clear();
+        return companyList;
+    }
+
+
+    class PairClassComparator implements Comparator<PairClass> {
+
+        // Overriding compare()method of Comparator
+        // for descending order of cgpa
+        public int compare(PairClass s1, PairClass s2) {
+            if (s1.loss < s2.loss)
+                return 1;
+            else if (s1.loss > s2.loss)
+                return -1;
+            return 0;
+        }
+    }
+
 }
 
 
